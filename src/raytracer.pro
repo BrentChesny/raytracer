@@ -25,10 +25,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    camera.cpp \
+    scene.cpp \
+    object.cpp \
+    light.cpp \
+    raytracer.cpp \
+    intersection.cpp \
+    ray.cpp \
+    sphere.cpp \
+    plane.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    camera.h \
+    scene.h \
+    object.h \
+    light.h \
+    raytracer.h \
+    intersection.h \
+    ray.h \
+    sphere.h \
+    plane.h
 
 FORMS += \
         mainwindow.ui
