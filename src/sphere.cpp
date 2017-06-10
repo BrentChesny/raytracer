@@ -14,15 +14,17 @@ Intersection *Sphere::intersect(const Ray &ray)
     QVector3D dir = ray.getDirection();
     QVector3D orig = ray.getOrigin();
 
-    float discriminant = pow(QVector3D::dotProduct(dir, orig - _center), 2) -
-            QVector3D::dotProduct(dir, dir) * (QVector3D::dotProduct(orig - _center, orig - _center) - pow(_radius, 2));
+    float a = QVector3D::dotProduct(dir, dir);
+    float b = 2.0f * QVector3D::dotProduct(dir, orig - _center);
+    float c = QVector3D::dotProduct(orig - _center, orig - _center) - pow(_radius, 2);
+
+    float discriminant = b*b - 4*a*c;
 
     if (discriminant <= 1e-8) {
         return new Intersection;
     } else {
-        discriminant = sqrt(discriminant);
-        float dist1 = - QVector3D::dotProduct(dir, orig - _center) + discriminant;
-        float dist2 = - QVector3D::dotProduct(dir, orig - _center) - discriminant;
+        float dist1 = (-b + sqrt(discriminant)) / (2.0f * a);
+        float dist2 = (-b - sqrt(discriminant)) / (2.0f * a);
         float dist;
 
         if (dist1 <= 1e-8 && dist2 <= 1e-8)
