@@ -32,15 +32,9 @@ int main(int argc, char *argv[])
 
     QImage result = raytracer.render(scene, camera, 1024, 768);
 
-
-    QLabel myLabel;
-    myLabel.setPixmap(QPixmap::fromImage(result));
-    myLabel.show();
-
-    //return 0;
-
-//    MainWindow w;
-//    w.show();
+    QLabel w;
+    w.setPixmap(QPixmap::fromImage(result));
+    w.show();
 
     return a.exec();
 }
