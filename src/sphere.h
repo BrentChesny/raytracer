@@ -6,7 +6,8 @@
 class Sphere : public Object
 {
 public:
-    Sphere(QColor color, float reflectivity, float specular, float specularFalloff, QVector3D center, float radius);
+    Sphere(const Material &material, QVector3D center, float radius);
+    virtual ~Sphere() {};
 
     Intersection *intersect(const Ray &ray);
 

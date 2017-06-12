@@ -3,19 +3,20 @@
 
 #include <QVector3D>
 
+#include "color.h"
 
 
 class Light
 {
 public:
-    Light(QVector3D position, float intensity);
+    Light(QVector3D position);
 
     QVector3D getPosition() const { return _position; }
-    float getIntensity() const { return _intensity; }
+    Color getIntensity() const;
 
 private:
     QVector3D _position;
-    float _intensity;
+    Color _intensity;
 };
 
 #endif // LIGHT_H

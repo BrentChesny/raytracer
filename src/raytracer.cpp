@@ -1,6 +1,5 @@
 #include "raytracer.h"
 
-#include <QtGlobal>
 #include <QDebug>
 
 #include <random>
@@ -21,7 +20,7 @@ QImage RayTracer::render(const Scene &scene, const Camera &camera, int width, in
     {
         for(int y = 0; y < height; y++)
         {
-            int ns = 16;
+            int ns = 4;
             int r = 0.0f, g = 0.0f, b = 0.0f;
             for (int s = 0; s < ns; ++s) {
                 float dx = (float) rand() / RAND_MAX;
@@ -32,21 +31,21 @@ QImage RayTracer::render(const Scene &scene, const Camera &camera, int width, in
 
                 Ray ray(camera.getPosition(), camera.getLookAt() + xShift + yShift - camera.getPosition());
 
-                QColor color = this->trace(scene, ray, maxDepth, 0);
+                Color color = this->trace(scene, ray, maxDepth, 0);
 
                 r += color.red();
                 g += color.green();
                 b += color.blue();
             }
 
-            image.setPixelColor(x, height - y - 1, QColor(r/ns, g/ns, b/ns));
+            image.setPixelColor(x, height - y - 1, Color(r/ns, g/ns, b/ns));
         }
     }
 
     return image;
 }
 
-QColor RayTracer::trace(const Scene &scene, const Ray &ray, int maxDepth, int depth)
+Color RayTracer::trace(const Scene &scene, const Ray &ray, int maxDepth, int depth)
 {
     Intersection* intersection = this->findClosestIntersection(scene, ray);
 
@@ -54,28 +53,45 @@ QColor RayTracer::trace(const Scene &scene, const Ray &ray, int maxDepth, int de
         return scene.getAmbient();
 
     Object* object = intersection->getObject();
-    if (depth == maxDepth)
-        return object->getColor();
+    QVector3D P = intersection->getPoint();
+    QVector3D N = intersection->getNormal();
 
-    QColor reflectedColor(0, 0, 0);
-    if (object->getReflectivity() > 0.0f) {
-        QVector3D reflectedDir = ray.getDirection() - 2 * intersection->getNormal() * QVector3D::dotProduct(ray.getDirection(), intersection->getNormal());
-        Ray reflectedRay(intersection->getPoint() + (EPSILON * intersection->getNormal()), reflectedDir);
+    Material mat = object->material();
+
+    Color color = scene.getAmbient() * mat.Ka();
+
+    foreach(Light* light, scene.getLights())
+    {
+        QVector3D Lm = (light->getPosition() - P).normalized();
+        Ray ray(P + (EPSILON * N), Lm);
+
+        if (this->findClosestIntersection(scene, ray) == nullptr)
+        {
+            float lambertian = QVector3D::dotProduct(Lm, N);
+
+            color += light->getIntensity() * lambertian * mat.Kd();
+
+            if (lambertian > 0.0f)
+            {
+                QVector3D Rm = 2.0f * lambertian * N - Lm;
+                QVector3D V = (ray.getOrigin() - P).normalized();
+
+                float RmV = QVector3D::dotProduct(Rm, V);
+
+                color += light->getIntensity() * pow(RmV, mat.shininess()) * mat.Ks();
+            }
+        }
+    }
+
+    Color reflectedColor(0, 0, 0);
+    if (depth < maxDepth && mat.reflectivity() > 0.0f) {
+        QVector3D R = ray.getDirection() - 2 * N * QVector3D::dotProduct(ray.getDirection(), N);
+        Ray reflectedRay(P + (EPSILON * N), R);
 
         reflectedColor = this->trace(scene, reflectedRay, maxDepth, depth+1);
     }
 
-    float brightness = this->diffuseToLights(scene, intersection->getPoint(), intersection->getNormal(), intersection->getObject());
-
-    int r = (int) ((object->getReflectivity() * reflectedColor.red() + (1.0f - object->getReflectivity()) * object->getColor().red()) * brightness);
-    int g = (int) ((object->getReflectivity() * reflectedColor.green() + (1.0f - object->getReflectivity()) * object->getColor().green()) * brightness);
-    int b = (int) ((object->getReflectivity() * reflectedColor.blue() + (1.0f - object->getReflectivity()) * object->getColor().blue()) * brightness);
-
-    r = qBound(0, 255, r);
-    g = qBound(0, 255, g);
-    b = qBound(0, 255, b);
-
-    return QColor(r, g, b);
+    return mat.color() * (color + reflectedColor * mat.reflectivity());
 }
 
 Intersection *RayTracer::findClosestIntersection(const Scene &scene, const Ray &ray)
@@ -96,27 +112,4 @@ Intersection *RayTracer::findClosestIntersection(const Scene &scene, const Ray &
     }
 
     return closestIntersection;
-}
-
-float RayTracer::diffuseToLights(const Scene &scene, QVector3D point, QVector3D normal, Object *object)
-{
-    float brightness = 0.0f;
-
-    foreach(Light* light, scene.getLights())
-    {
-        QVector3D toLight = light->getPosition() - point;
-        Ray ray(point + (EPSILON * normal), toLight);
-
-        if (this->findClosestIntersection(scene, ray) == nullptr) {
-            float cosine = fmax(0, QVector3D::dotProduct(toLight, normal) / (toLight.length() * normal.length()));
-            float intensity = 100.0f * light->getIntensity() / QVector3D::dotProduct(toLight, toLight);
-
-            brightness += intensity * cosine;
-
-            if (object->getSpecular() > 0.0f)
-                brightness += intensity * object->getSpecular() * pow(cosine, object->getSpecularFalloff());
-        }
-    }
-
-    return brightness + scene.getGamma();
 }

@@ -8,7 +8,7 @@
 class Ray
 {
 public:
-    Ray(QVector3D origin, QVector3D direction);
+    Ray(const QVector3D &origin, const QVector3D &direction);
 
     QVector3D getOrigin() const { return _origin; }
     QVector3D getDirection() const { return _direction; }

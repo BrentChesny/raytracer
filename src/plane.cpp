@@ -1,8 +1,8 @@
 #include "plane.h"
 #include "intersection.h"
 
-Plane::Plane(QColor color, float reflectivity, float specular, float specularFalloff, QVector3D center, QVector3D normal) :
-    Object(color, reflectivity, specular, specularFalloff), _center(center), _normal(normal)
+Plane::Plane(const Material &material, QVector3D center, QVector3D normal) :
+    Object(material), _center(center), _normal(normal)
 {
 
 }

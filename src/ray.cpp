@@ -1,6 +1,6 @@
 #include "ray.h"
 
-Ray::Ray(QVector3D origin, QVector3D direction) :
+Ray::Ray(const QVector3D &origin, const QVector3D &direction) :
     _origin(origin), _direction(direction.normalized())
 {
 }

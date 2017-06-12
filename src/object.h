@@ -1,29 +1,24 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include "material.h"
 #include "ray.h"
-
-#include <QColor>
 
 class Intersection;
 
 class Object
 {
 public:
-    Object(QColor color, float reflectivity, float specular, float specularFalloff);
+    Object(const Material material);
+    virtual ~Object() {};
 
     virtual Intersection* intersect(const Ray &ray) = 0;
 
-    QColor getColor() const { return _color; }
-    float getReflectivity() const { return _reflectivity; }
-    float getSpecular() const { return _specular; }
-    float getSpecularFalloff() const { return _specularFalloff; }
+    Material material() const;
+    void setMaterial(const Material &material);
 
 protected:
-    QColor _color;
-    float _reflectivity;
-    float _specular;
-    float _specularFalloff;
+    Material _material;
 };
 
 #endif // OBJECT_H

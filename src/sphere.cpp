@@ -3,8 +3,8 @@
 
 #include <math.h>
 
-Sphere::Sphere(QColor color, float reflectivity, float specular, float specularFalloff, QVector3D center, float radius) :
-    Object(color, reflectivity, specular, specularFalloff), _center(center), _radius(radius)
+Sphere::Sphere(const Material &material, QVector3D center, float radius) :
+    Object(material), _center(center), _radius(radius)
 {
 
 }

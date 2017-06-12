@@ -34,7 +34,9 @@ SOURCES += \
     intersection.cpp \
     ray.cpp \
     sphere.cpp \
-    plane.cpp
+    plane.cpp \
+    material.cpp \
+    color.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -46,7 +48,9 @@ HEADERS += \
     intersection.h \
     ray.h \
     sphere.h \
-    plane.h
+    plane.h \
+    material.h \
+    color.h
 
 FORMS += \
         mainwindow.ui

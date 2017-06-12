@@ -7,7 +7,8 @@
 class Plane : public Object
 {
 public:
-    Plane(QColor color, float reflectivity, float specular, float specularFalloff, QVector3D center, QVector3D normal);
+    Plane(const Material &material, QVector3D center, QVector3D normal);
+    virtual ~Plane() {};
 
     Intersection *intersect(const Ray &ray);
 

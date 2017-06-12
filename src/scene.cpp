@@ -1,6 +1,6 @@
 #include "scene.h"
 
-Scene::Scene(QColor ambient, float gamma) :
+Scene::Scene(Color ambient, float gamma) :
     _ambient(ambient), _gamma(gamma)
 {
 
