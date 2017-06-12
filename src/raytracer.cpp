@@ -3,6 +3,7 @@
 #include <QtGlobal>
 #include <QDebug>
 
+#include <random>
 #include <limits>
 #include <math.h>
 
@@ -18,17 +19,27 @@ QImage RayTracer::render(const Scene &scene, const Camera &camera, int width, in
 
     for(int x = 0; x < width; x++)
     {
-        //qDebug() << "Tracing column: " << x;
         for(int y = 0; y < height; y++)
         {
-            QVector3D xShift = (x - width/2.0) / width * camera.getFov() * camera.getRight();
-            QVector3D yShift = (y - height/2.0) / width * camera.getFov() * camera.getUp();
+            int ns = 16;
+            int r = 0.0f, g = 0.0f, b = 0.0f;
+            for (int s = 0; s < ns; ++s) {
+                float dx = (float) rand() / RAND_MAX;
+                float dy = (float) rand() / RAND_MAX;
 
-            Ray ray(camera.getPosition(), camera.getLookAt() + xShift + yShift - camera.getPosition());
+                QVector3D xShift = (x - width/2.0 + dx) / width * camera.getFov() * camera.getRight();
+                QVector3D yShift = (y - height/2.0 + dy) / width * camera.getFov() * camera.getUp();
 
-            QColor color = this->trace(scene, ray, maxDepth, 0);
+                Ray ray(camera.getPosition(), camera.getLookAt() + xShift + yShift - camera.getPosition());
 
-            image.setPixelColor(x, height - y - 1, color);
+                QColor color = this->trace(scene, ray, maxDepth, 0);
+
+                r += color.red();
+                g += color.green();
+                b += color.blue();
+            }
+
+            image.setPixelColor(x, height - y - 1, QColor(r/ns, g/ns, b/ns));
         }
     }
 
@@ -56,8 +67,6 @@ QColor RayTracer::trace(const Scene &scene, const Ray &ray, int maxDepth, int de
 
     float brightness = this->diffuseToLights(scene, intersection->getPoint(), intersection->getNormal(), intersection->getObject());
 
-    //brightness = 1.0f;
-
     int r = (int) ((object->getReflectivity() * reflectedColor.red() + (1.0f - object->getReflectivity()) * object->getColor().red()) * brightness);
     int g = (int) ((object->getReflectivity() * reflectedColor.green() + (1.0f - object->getReflectivity()) * object->getColor().green()) * brightness);
     int b = (int) ((object->getReflectivity() * reflectedColor.blue() + (1.0f - object->getReflectivity()) * object->getColor().blue()) * brightness);
@@ -65,9 +74,6 @@ QColor RayTracer::trace(const Scene &scene, const Ray &ray, int maxDepth, int de
     r = qBound(0, 255, r);
     g = qBound(0, 255, g);
     b = qBound(0, 255, b);
-
-    //if (r == 0 && g == 0 && b == 0)
-    //    qDebug() << r << " " << g << " " << b << " " << brightness;
 
     return QColor(r, g, b);
 }
