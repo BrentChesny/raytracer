@@ -20,7 +20,7 @@ QImage RayTracer::render(const Scene &scene, const Camera &camera, int width, in
     {
         for(int y = 0; y < height; y++)
         {
-            int ns = 4;
+            int ns = 16;
             int r = 0.0f, g = 0.0f, b = 0.0f;
             for (int s = 0; s < ns; ++s) {
                 float dx = (float) rand() / RAND_MAX;
@@ -69,7 +69,7 @@ Color RayTracer::trace(const Scene &scene, const Ray &ray, int maxDepth, int dep
         {
             float lambertian = QVector3D::dotProduct(Lm, N);
 
-            color += light->getIntensity() * lambertian * mat.Kd();
+            color += light->getColor() * lambertian * mat.Kd() * light->getIntensity();
 
             if (lambertian > 0.0f)
             {
@@ -78,7 +78,7 @@ Color RayTracer::trace(const Scene &scene, const Ray &ray, int maxDepth, int dep
 
                 float RmV = QVector3D::dotProduct(Rm, V);
 
-                color += light->getIntensity() * pow(RmV, mat.shininess()) * mat.Ks();
+                color += light->getColor() * pow(RmV, mat.shininess()) * mat.Ks() * light->getIntensity();
             }
         }
     }

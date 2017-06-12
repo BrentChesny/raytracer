@@ -7,7 +7,7 @@
 class Material
 {
 public:
-    Material(const Color &color, float Ka = 0.2f, float Kd = 0.6f, float Ks = 0.6f, float reflectivity = 0.13f, float shininess = 50.0f);
+    Material(const Color &color, float Ka = 0.2f, float Kd = 0.6f, float Ks = 0.6f, float reflectivity = 0.13f, float shininess = 100.0f);
 
     float Ka() const;
     void setKa(float Ka);

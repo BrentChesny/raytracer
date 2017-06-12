@@ -31,10 +31,10 @@ int main(int argc, char *argv[])
     scene.addObject(new Sphere(redMat, QVector3D(8.5, 2.2, 0.5), 0.5f));
     scene.addObject(new Sphere(redMat, QVector3D(4.6, 2.15, 0.9), 0.9f));
 
-    scene.addLight(new Light(QVector3D(1.0f, -8.0f, 10.0f)));
+    scene.addLight(new Light(QVector3D(1.0f, -8.0f, 10.0f), Color::WHITE, 1.1f));
     //scene.addLight(new Light(QVector3D(6.5f, -10.0f, 5.0f)));
 
-    QImage result = raytracer.render(scene, camera);
+    QImage result = raytracer.render(scene, camera, 1024, 748);
 
     QLabel w;
     w.setPixmap(QPixmap::fromImage(result));
